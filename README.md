@@ -627,7 +627,7 @@ No formal test case has been executed yet: all 27 are Not run, because the injec
 | Unit tests (IBAN masking, pinned XSD compiles) | 5 of 5 passed on .NET 10 | Passed |
 | SQL scripts on SQL Server 2022 in Docker | 12 tables; 19 requirements, 15 rules, 27 test cases seeded | Passed |
 | API health check (`GET /healthz`) | `200 OK` | Passed |
-| rapide generation, `smoke-001` | 9 of 50 files; configured countries had no rapide BIC data (GAP-7) | Failed, fixed |
+| rapide generation, `smoke-001` | 9 of 50 files; configured countries had no rapide reference data (GAP-7) | Failed, fixed |
 | rapide generation, `smoke-002` | 50 of 50 files | Passed |
 | XSD check on `smoke-002` with `xmllint`, after extracting `Document` | 50 of 50 valid | Passed |
 | Field checks on `smoke-002` | 0 duplicate `MsgId`, `EndToEndId` or UETR; 50 of 50 UETRs are UUID v4; 6 currencies; 23 corridors | Passed |
@@ -755,7 +755,7 @@ flowchart TD
 
 ## Technical Contributions
 
-**Status:** in progress. The project foundation is built; the validator, rule engine and anomaly scorer are not, so no detection, throughput or anomaly results are reported yet.
+**Status:** in progress.
 
 - Designing an end-to-end ISO 20022 pacs.008 validation platform that generates 5,000+ synthetic messages per run with the AWS rapide generator (Java, Spring Boot), injects rule-targeted and statistical-anomaly defects as stored ground truth, and validates every message in a 5-stage C# (.NET 10) `System.Threading.Channels` pipeline (reader → XSD validator → rule engine → anomaly scorer → batched `SqlBulkCopy` writer), to be benchmarked at 1, 2, 4 and 8 consumers with identical results required single-threaded and in parallel.
 - Specifying a 15-rule validation catalog across schema, format, business, duplicate and security categories, covering ISO 9362 BIC format, ISO 13616 IBAN mod-97 checksums, ISO 4217 currency and decimal precision, UUID v4 UETR checks, `NbOfTxs`/`CtrlSum` reconciliation, charge-bearer and purpose-code lists, and run-scoped duplicate detection, to be shared as one library by the batch worker and an ASP.NET Core `POST /validate` API.
