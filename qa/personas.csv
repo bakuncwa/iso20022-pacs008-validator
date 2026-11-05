@@ -1,0 +1,5 @@
+Persona ID,Name,Role,Contact/Team,Goals & Access,Key Modules/Features,Technical Level
+P001,Payments Operations Analyst,Operations user (internal),"Payments Operations, Workflows 1–4","Knows which messages fail and why before they are released; reads results, cannot change rules","Batch run results, rule failures by XPath, CSV export",Intermediate
+P002,Compliance / Technology Risk Reviewer,Control reviewer (internal),"Technology Risk, Workflow 4","Needs evidence that masking, validation and audit trails are tested","Masking checks, RTM coverage, audit fields",Intermediate
+P003,QA / Security Tester,QA and penetration tester (internal),"QA Team, Workflows 5–6","Probes the API for injection, authentication and data-exposure flaws; runs load tests","POST /validate, ZAP scans, NBomber scenarios",Advanced
+P004,Integration Developer,API consumer (internal),"Integration Team, Workflow 5","Calls the API from upstream systems and needs fast, consistent responses","POST /validate, GET /runs/{runId}",Advanced

@@ -1,0 +1,76 @@
+# rapide configuration. Keys verified against rapide commit d96f648 (the README example is illustrative).
+# Countries must exist in rapide's BIC data (US, TH, GB, CA, IE, IN, MX), or messages are lost: see GAP-7.
+# rapide takes BICs inline, not as file paths. generator/reference/*.csv hold the same fictitious lists.
+# It is copied to rapide's pacs008/ directory, where Spring Boot layers it over the packaged defaults.
+rapide:
+  PurposeCode:
+    - CASH
+    - SALA
+    - SUPP
+    - TRAD
+    - INTC
+  Currency:
+    - Country: US
+      Code: USD
+    - Country: IE
+      Code: EUR
+    - Country: GB
+      Code: GBP
+    - Country: CA
+      Code: CAD
+    - Country: MX
+      Code: MXN
+    - Country: TH
+      Code: THB
+  SourceBicList:
+    - ZZSAUS22
+    - ZZSBIE22
+    - ZZSCGB22
+    - ZZSDCA22
+    - ZZSEMX22
+    - ZZSFTH22
+    - ZZSGUS22
+    - ZZSHIE22
+    - ZZSIGB22
+    - ZZSJCA22
+    - ZZSKMX22
+    - ZZSLTH22
+    - ZZSMUS22
+    - ZZSNIE22
+    - ZZSOGB22
+    - ZZSPCA22
+    - ZZSQMX22
+    - ZZSRTH22
+    - ZZSSUS22
+    - ZZSTIE22
+    - ZZSUGB22
+    - ZZSVCA22
+    - ZZSWMX22
+    - ZZSXTH22
+    - ZZSYUS22
+  DestinationBicList:
+    - ZZDAUS22
+    - ZZDBIE22
+    - ZZDCGB22
+    - ZZDDCA22
+    - ZZDEMX22
+    - ZZDFTH22
+    - ZZDGUS22
+    - ZZDHIE22
+    - ZZDIGB22
+    - ZZDJCA22
+    - ZZDKMX22
+    - ZZDLTH22
+    - ZZDMUS22
+    - ZZDNIE22
+    - ZZDOGB22
+    - ZZDPCA22
+    - ZZDQMX22
+    - ZZDRTH22
+    - ZZDSUS22
+    - ZZDTIE22
+    - ZZDUGB22
+    - ZZDVCA22
+    - ZZDWMX22
+    - ZZDXTH22
+    - ZZDYUS22

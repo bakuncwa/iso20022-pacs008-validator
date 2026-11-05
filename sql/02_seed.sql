@@ -1,0 +1,67 @@
+-- Generated from the README tables. Reference data only; safe to run once after 01_schema.sql.
+USE Iso20022;
+GO
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-ISO-001',N'FR1',N'P001',N'As an analyst, I need a reproducible batch of pacs.008 messages so I can compare results across runs.',N'High');
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-ISO-002',N'FR3',N'P001',N'As an analyst, I need known defects injected so detection accuracy can be measured.',N'High');
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-ISO-003',N'FR4',N'P001',N'As an analyst, I need every message checked against the pacs.008 XSD so malformed messages are rejected.',N'High');
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-ISO-004',N'FR4',N'P001',N'As an analyst, I need clean messages to pass so I am not chasing false alarms.',N'High');
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-ISO-005',N'FR5',N'P001',N'As an analyst, I need identifier formats checked (BIC, IBAN, UETR) so routing does not fail.',N'High');
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-ISO-006',N'FR5',N'P001',N'As an analyst, I need currency and amount rules checked so settlement amounts are correct.',N'High');
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-ISO-007',N'FR6',N'P001',N'As an analyst, I need header totals reconciled so batch counts match.',N'High');
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-ISO-008',N'FR6',N'P001',N'As an analyst, I need charge bearer and purpose codes checked against allowed lists.',N'Medium');
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-ISO-009',N'FR7',N'P001',N'As an analyst, I need duplicate messages flagged so a payment is not sent twice.',N'High');
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-ISO-010',N'FR10',N'P002',N'As a reviewer, I need account numbers masked in logs and API output so sensitive data is not exposed.',N'High');
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-ISO-011',N'FR9',N'P002',N'As a reviewer, I need every result traceable to run, message, rule and code version.',N'Medium');
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-ISO-012',N'FR11',N'P002',N'As a reviewer, I need RTM coverage shown in Power BI so untested requirements are visible.',N'Medium');
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-ISO-013',N'FR8',N'P004',N'As a developer, I need to validate a single message over the API.',N'High');
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-ISO-014',N'FR8',N'P004',N'As a developer, I need batch and API results to agree.',N'Medium');
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-SEC-001',N'SR2',N'P003',N'As the system, the API must reject unauthenticated requests.',N'High');
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-SEC-002',N'SR3',N'P003',N'As the system, the API must block XML external entity (XXE) payloads.',N'High');
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-SEC-003',N'SR3',N'P003',N'As the system, the API must reject oversized payloads.',N'Medium');
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-PERF-001',N'NFR1, NFR3',N'P003',N'As a tester, I need throughput measured by consumer count to show the gain from parallelism.',N'High');
+INSERT INTO dbo.REQUIREMENT (RequirementId,FrReference,PersonaId,UserStory,Priority) VALUES (N'REQ-PERF-002',N'NFR2',N'P003',N'As a tester, I need API latency measured under load.',N'Medium');
+GO
+INSERT INTO dbo.RULE_DEFINITION (RuleId,Name,Category,Severity,RequirementId) VALUES (N'R-SCH-01',N'Message conforms to the pacs.008 XSD',N'Schema',N'Error',N'REQ-ISO-003');
+INSERT INTO dbo.RULE_DEFINITION (RuleId,Name,Category,Severity,RequirementId) VALUES (N'R-FMT-01',N'BIC is 8 or 11 characters in ISO 9362 format',N'Format',N'Error',N'REQ-ISO-005');
+INSERT INTO dbo.RULE_DEFINITION (RuleId,Name,Category,Severity,RequirementId) VALUES (N'R-FMT-02',N'IBAN passes the ISO 13616 mod-97 checksum',N'Format',N'Error',N'REQ-ISO-005');
+INSERT INTO dbo.RULE_DEFINITION (RuleId,Name,Category,Severity,RequirementId) VALUES (N'R-FMT-03',N'Currency is a valid ISO 4217 code',N'Format',N'Error',N'REQ-ISO-006');
+INSERT INTO dbo.RULE_DEFINITION (RuleId,Name,Category,Severity,RequirementId) VALUES (N'R-FMT-04',N'Amount uses the currency''s allowed decimal places (for example JPY has 0)',N'Format',N'Error',N'REQ-ISO-006');
+INSERT INTO dbo.RULE_DEFINITION (RuleId,Name,Category,Severity,RequirementId) VALUES (N'R-FMT-05',N'UETR (Unique End-to-end Transaction Reference) is a valid UUID version 4',N'Format',N'Error',N'REQ-ISO-005');
+INSERT INTO dbo.RULE_DEFINITION (RuleId,Name,Category,Severity,RequirementId) VALUES (N'R-BUS-01',N'Amount is greater than zero',N'Business',N'Error',NULL);
+INSERT INTO dbo.RULE_DEFINITION (RuleId,Name,Category,Severity,RequirementId) VALUES (N'R-BUS-02',N'Number of transactions (NbOfTxs) equals the transactions present',N'Business',N'Error',N'REQ-ISO-007');
+INSERT INTO dbo.RULE_DEFINITION (RuleId,Name,Category,Severity,RequirementId) VALUES (N'R-BUS-03',N'Control sum (CtrlSum), when present, equals the sum of amounts',N'Business',N'Error',N'REQ-ISO-007');
+INSERT INTO dbo.RULE_DEFINITION (RuleId,Name,Category,Severity,RequirementId) VALUES (N'R-BUS-04',N'Charge bearer is one of DEBT, CRED, SHAR, SLEV',N'Business',N'Error',N'REQ-ISO-008');
+INSERT INTO dbo.RULE_DEFINITION (RuleId,Name,Category,Severity,RequirementId) VALUES (N'R-BUS-05',N'Purpose code is in the configured code list',N'Business',N'Error',N'REQ-ISO-008');
+INSERT INTO dbo.RULE_DEFINITION (RuleId,Name,Category,Severity,RequirementId) VALUES (N'R-BUS-06',N'Settlement date is not before the creation date',N'Business',N'Error',NULL);
+INSERT INTO dbo.RULE_DEFINITION (RuleId,Name,Category,Severity,RequirementId) VALUES (N'R-BUS-07',N'Debtor agent and creditor agent are not the same BIC',N'Business',N'Error',NULL);
+INSERT INTO dbo.RULE_DEFINITION (RuleId,Name,Category,Severity,RequirementId) VALUES (N'R-DUP-01',N'MsgId, EndToEndId and UETR are unique within the run',N'Duplicate',N'Error',N'REQ-ISO-009');
+INSERT INTO dbo.RULE_DEFINITION (RuleId,Name,Category,Severity,RequirementId) VALUES (N'R-SEC-01',N'No unmasked IBAN appears in logs or API output',N'Security',N'Error',N'REQ-ISO-010');
+GO
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-001',N'REQ-ISO-001',N'Functional',N'High');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-002',N'REQ-ISO-001',N'Functional',N'Medium');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-003',N'REQ-ISO-002',N'Functional',N'High');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-004',N'REQ-ISO-002',N'Functional',N'Medium');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-005',N'REQ-ISO-003',N'Negative',N'High');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-006',N'REQ-ISO-003',N'Negative',N'High');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-007',N'REQ-ISO-004',N'Functional',N'High');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-008',N'REQ-ISO-005',N'Boundary',N'High');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-009',N'REQ-ISO-005',N'Negative',N'High');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-010',N'REQ-ISO-005',N'Negative',N'Medium');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-011',N'REQ-ISO-006',N'Negative',N'High');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-012',N'REQ-ISO-006',N'Boundary',N'High');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-013',N'REQ-ISO-007',N'Negative',N'High');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-014',N'REQ-ISO-007',N'Boundary',N'High');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-015',N'REQ-ISO-008',N'Negative',N'Medium');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-016',N'REQ-ISO-009',N'Functional',N'High');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-017',N'REQ-ISO-010',N'Security',N'High');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-018',N'REQ-ISO-013',N'Functional',N'High');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-019',N'REQ-ISO-014',N'Integration',N'Medium');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-020',N'REQ-ISO-011',N'Workflow',N'Medium');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-021',N'REQ-ISO-012',N'Workflow',N'Medium');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-022',N'REQ-PERF-001',N'Performance',N'High');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-023',N'REQ-PERF-001',N'Performance',N'High');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-024',N'REQ-PERF-002',N'Load',N'Medium');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-025',N'REQ-SEC-001',N'Security',N'High');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-026',N'REQ-SEC-002',N'Security',N'High');
+INSERT INTO dbo.TEST_CASE (TestCaseId,RequirementId,Type,Priority) VALUES (N'TC-027',N'REQ-SEC-003',N'Security',N'Medium');
+GO

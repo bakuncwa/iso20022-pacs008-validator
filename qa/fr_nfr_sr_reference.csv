@@ -1,0 +1,26 @@
+Ref,Requirement
+FR1,Generate N pacs.008 messages with rapide and store them per run
+FR2,"Configure rapide via application.yaml (purpose codes, currencies, fictitious BICs)"
+FR3,Inject controlled defects and record ground truth
+FR4,Validate every message against the pinned pacs.008 XSD
+FR5,"Apply format rules (BIC, IBAN, UETR, currency, amount precision)"
+FR6,"Apply business rules (totals, charge bearer, purpose code, dates, agents)"
+FR7,"Detect duplicate MsgId, EndToEndId and UETR within a run"
+FR8,Expose POST /validate and GET /runs/{runId}
+FR9,"Store runs, results, defects and test executions in Azure SQL"
+FR10,Mask account numbers in logs and API responses
+FR11,"Publish the Power BI report (quality, failures, performance, security, RTM coverage)"
+FR12,Export valid messages to a flat CSV extract (Should)
+FR13,Re-run a past batch with the same seed (Should)
+NFR1,"Report throughput at 1, 2, 4 and 8 consumers"
+NFR2,Report API p95 latency at steady load
+NFR3,Identical results single-threaded and parallel for the same seed
+NFR4,Consumer count configurable without code changes
+NFR5,A malformed file never stops a run
+NFR6,"Every result links to run, message, rule and code version"
+NFR7,Runs within Azure free or student credits
+SR1,"No full account numbers in logs, errors or API responses"
+SR2,API requires authentication (Microsoft Entra ID or API key)
+SR3,Reject oversized payloads and XML external entities
+SR4,Secrets stored in Azure Key Vault
+SR5,Security scans run only against this project's own deployment

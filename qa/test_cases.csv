@@ -1,0 +1,28 @@
+Workflow,Test Case ID,Test Description,Pre-conditions,Execution Steps,Expected Results,Priority,Type
+WORKFLOW 1 — Message Generation & Defect Injection,TC-001,"Generate a 5,000-message batch",rapide built; application.yaml set,1. Run make generate N=5000 RUN=run-001. 2. Count files in raw/run-001/.,"5,000 XML files present",High,Functional
+WORKFLOW 1 — Message Generation & Defect Injection,TC-002,Reproducible generation with the same seed,TC-001 passed,1. Re-run with the same seed into run-002. 2. Compare file hashes.,All hashes match,Medium,Functional
+WORKFLOW 1 — Message Generation & Defect Injection,TC-003,Inject defects at a 10% rate,Raw batch exists,1. Run make inject RATE=0.10. 2. Count INJECTED_DEFECT rows.,"About 500 rows, one per mutated message",High,Functional
+WORKFLOW 1 — Message Generation & Defect Injection,TC-004,Injected defect targets its rule,TC-003 passed,1. Pick 10 injected messages. 2. Compare DefectType with TargetRuleId.,Every defect maps to exactly one rule,Medium,Functional
+WORKFLOW 2 — Schema Validation,TC-005,Missing mandatory element,XSD loaded,1. Remove <MsgId> from a valid message. 2. Validate.,"Schema error, R-SCH-01, XPath of the missing element",High,Negative
+WORKFLOW 2 — Schema Validation,TC-006,Wrong data type,XSD loaded,1. Set <IntrBkSttlmAmt> to text. 2. Validate.,"Schema error, R-SCH-01",High,Negative
+WORKFLOW 2 — Schema Validation,TC-007,Clean message passes,XSD loaded,1. Validate an unmodified rapide message.,Outcome Valid; zero failures,High,Functional
+WORKFLOW 3 — Business Rule Validation,TC-008,Invalid BIC length,Schema-valid message,1. Set debtor agent BIC to 9 characters. 2. Validate.,R-FMT-01 fails,High,Boundary
+WORKFLOW 3 — Business Rule Validation,TC-009,IBAN check digits wrong,Schema-valid message,1. Change one IBAN check digit. 2. Validate.,R-FMT-02 fails; IBAN masked in output,High,Negative
+WORKFLOW 3 — Business Rule Validation,TC-010,UETR not a UUID v4,Schema-valid message,1. Replace UETR with a version 1 UUID. 2. Validate.,R-FMT-05 fails,Medium,Negative
+WORKFLOW 3 — Business Rule Validation,TC-011,Unknown currency code,Schema-valid message,1. Set currency to XYZ. 2. Validate.,R-FMT-03 fails,High,Negative
+WORKFLOW 3 — Business Rule Validation,TC-012,JPY amount with decimals,Schema-valid JPY message,1. Set amount to 1000.50. 2. Validate.,R-FMT-04 fails,High,Boundary
+WORKFLOW 3 — Business Rule Validation,TC-013,NbOfTxs mismatch,Schema-valid message,1. Set NbOfTxs to 2 with one transaction. 2. Validate.,R-BUS-02 fails,High,Negative
+WORKFLOW 3 — Business Rule Validation,TC-014,CtrlSum mismatch,Message with CtrlSum,1. Change CtrlSum by 0.01. 2. Validate.,R-BUS-03 fails,High,Boundary
+WORKFLOW 3 — Business Rule Validation,TC-015,Invalid charge bearer,Schema-valid message,1. Set charge bearer to XXXX. 2. Validate.,R-BUS-04 fails,Medium,Negative
+WORKFLOW 4 — Duplicate Detection & Data Masking,TC-016,Duplicate UETR in a run,Two messages prepared,1. Give both the same UETR. 2. Validate the run.,Second message fails R-DUP-01,High,Functional
+WORKFLOW 4 — Duplicate Detection & Data Masking,TC-017,No full IBAN in logs or API,A completed run,1. Search logs and API responses with an IBAN regex.,Zero full IBANs found,High,Security
+"WORKFLOW 5 — API, Reporting & Traceability",TC-018,Validate one message via API,API running; valid key,1. POST a valid message to /validate.,"200 OK, outcome Valid",High,Functional
+"WORKFLOW 5 — API, Reporting & Traceability",TC-019,Batch and API agree,Message from a batch run,1. Send it to /validate. 2. Compare with its batch result.,Same outcome and failed rules,Medium,Integration
+"WORKFLOW 5 — API, Reporting & Traceability",TC-020,Result traceability fields,A completed run,1. Query 20 random VALIDATION_RESULT rows.,"RunId, MessageId, RuleId, CodeVersion all present",Medium,Workflow
+"WORKFLOW 5 — API, Reporting & Traceability",TC-021,RTM coverage in Power BI,CI export loaded,1. Open the RTM coverage page. 2. Compare counts with the RTM.,Counts match; untested requirements listed,Medium,Workflow
+WORKFLOW 6 — Performance & Security,TC-022,Throughput by consumer count,"5,000-message batch","1. Run make bench at 1, 2, 4, 8 consumers.",Messages per second recorded for each,High,Performance
+WORKFLOW 6 — Performance & Security,TC-023,Parallel consistency,TC-022 data,1. Compare result sets at 1 and 8 consumers.,Result sets identical,High,Performance
+WORKFLOW 6 — Performance & Security,TC-024,API latency under load,API deployed,"1. Run NBomber steady, spike and soak scenarios.","p50, p95, p99 latency and error rate recorded",Medium,Load
+WORKFLOW 6 — Performance & Security,TC-025,Unauthenticated request,API running,1. POST to /validate with no key.,401 Unauthorized,High,Security
+WORKFLOW 6 — Performance & Security,TC-026,XXE payload,API running,1. POST a message with an external entity declaration.,Rejected; no external fetch,High,Security
+WORKFLOW 6 — Performance & Security,TC-027,Oversized payload,Payload limit set,1. POST a 10 MB body.,413 Payload Too Large,Medium,Security
