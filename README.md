@@ -588,35 +588,51 @@ No defects logged yet. Use IDs `BUG-001` onward; severity is one of **Blocker, C
 
 | Total Test Cases | Passed | Failed |
 |------------------|--------|--------|
-| 27 | — | — |
+| 27 | 0 | 0 |
+
+No formal test case has been executed yet: all 27 are Not run, because the injector and rule engine are not built. Pre-baseline smoke checks are reported separately below and do not count toward these totals.
 
 **▶ Defect summary**
 
 | Total Defects | Blocker | Critical | Major | Minor |
 |---------------|---------|----------|-------|-------|
-| — | — | — | — | — |
+| 0 | 0 | 0 | 0 | 0 |
 
 **▶ Coverage & metrics**
 
 | Metric | Value |
 |--------|-------|
 | Requirements mapped | 19 |
-| Test cases executed | — |
-| Pass rate (%) | Passed ÷ Total |
-| Fail rate (%) | Failed ÷ Total |
-| Workflows covered | 6 of 6 |
+| Test cases executed | 0 of 27 |
+| Pass rate (%) | — (nothing executed; Passed ÷ Total) |
+| Fail rate (%) | — (nothing executed; Failed ÷ Total) |
+| Workflows covered | 0 of 6 executed (6 of 6 mapped) |
 
 **▶ Per-module execution results**
 
 | Workflow | Total TCs | Passed | Failed | Pass Rate | Defects/Bugs Logged | Severity |
 |----------|-----------|--------|--------|-----------|---------------------|----------|
-| WORKFLOW 1 — Message Generation & Defect Injection | 4 | — | — | — | — | — |
-| WORKFLOW 2 — Schema Validation | 3 | — | — | — | — | — |
-| WORKFLOW 3 — Business Rule Validation | 8 | — | — | — | — | — |
-| WORKFLOW 4 — Duplicate Detection & Data Masking | 2 | — | — | — | — | — |
-| WORKFLOW 5 — API, Reporting & Traceability | 4 | — | — | — | — | — |
-| WORKFLOW 6 — Performance & Security | 6 | — | — | — | — | — |
-| **TOTAL** | **27** | — | — | — | — | — |
+| WORKFLOW 1 — Message Generation & Defect Injection | 4 | 0 | 0 | — | 0 | — |
+| WORKFLOW 2 — Schema Validation | 3 | 0 | 0 | — | 0 | — |
+| WORKFLOW 3 — Business Rule Validation | 8 | 0 | 0 | — | 0 | — |
+| WORKFLOW 4 — Duplicate Detection & Data Masking | 2 | 0 | 0 | — | 0 | — |
+| WORKFLOW 5 — API, Reporting & Traceability | 4 | 0 | 0 | — | 0 | — |
+| WORKFLOW 6 — Performance & Security | 6 | 0 | 0 | — | 0 | — |
+| **TOTAL** | **27** | **0** | **0** | — | **0** | — |
+
+**▶ Pre-baseline smoke checks (2026-11-05)**
+
+| Check | Result | Status |
+|-------|--------|--------|
+| Unit tests (IBAN masking, pinned XSD compiles) | 5 of 5 passed on .NET 10 | Passed |
+| SQL scripts on SQL Server 2022 in Docker | 12 tables; 19 requirements, 15 rules, 27 test cases seeded | Passed |
+| API health check (`GET /healthz`) | `200 OK` | Passed |
+| rapide generation, `smoke-001` | 9 of 50 files; configured countries had no rapide BIC data (GAP-7) | Failed, fixed |
+| rapide generation, `smoke-002` | 50 of 50 files | Passed |
+| XSD check on `smoke-002` with `xmllint`, after extracting `Document` | 50 of 50 valid | Passed |
+| Field checks on `smoke-002` | 0 duplicate `MsgId`, `EndToEndId` or UETR; 50 of 50 UETRs are UUID v4; 6 currencies; 23 corridors | Passed |
+
+These checks are not TC-001 or TC-007: TC-001 requires 5,000 messages, and TC-007 requires the validator. Open issues are tracked in `qa/spec-gaps.md`.
 
 **▶ Load testing (NBomber) and security (OWASP ZAP) results**
 
@@ -635,17 +651,18 @@ As with any security sampler, a "failed" request on TC-025 to TC-027 is the expe
 
 ## Results
 
-Results will be published here after the first baseline run:
+No baseline run has been completed. The figures below come from the 50-message `smoke-002` smoke run on 2026-11-05, which used `xmllint` for the XSD check because the C# validator is not built yet.
 
 | Metric | Value |
 |--------|-------|
-| Messages validated | — |
-| Detection rate | — |
-| False-positive rate | — |
-| Throughput at 1 / 8 consumers (msg/s) | — / — |
-| API p95 latency at steady load (ms) | — |
-| Open High-severity ZAP findings | — |
-| Anomaly scorer AUC | — |
+| Messages generated | 50 of 50 |
+| Messages validated | 50, XSD stage only; rule engine not built |
+| Detection rate | Not measured; injector not built |
+| False-positive rate | Not measured; 0 of 50 clean messages rejected at the XSD stage |
+| Throughput at 1 / 8 consumers (msg/s) | Not measured; worker not built |
+| API p95 latency at steady load (ms) | Not measured; `POST /validate` not built |
+| Open High-severity ZAP findings | Not measured; no scan run |
+| Anomaly scorer AUC | Not measured; scorer not built |
 
 ---
 
@@ -707,15 +724,6 @@ flowchart TD
 
 ---
 
-## Deployment & Container Hosting Cost Notes
-
-- Use the lowest Azure tiers: Azure SQL serverless (auto-pause), App Service free/basic tier or Container Apps consumption plan, Blob Storage hot tier for small volumes.
-- Develop locally against SQL Server in Docker; deploy to Azure only for API, load and security testing.
-- Stop or auto-pause resources when idle; Azure free account or student credits should cover a small deployment (confirm current allowances).
-- Run OWASP ZAP and NBomber only against this project's own deployment.
-
----
-
 ## Key Takeaways
 
 ### Design Decisions
@@ -747,12 +755,14 @@ flowchart TD
 
 ## Technical Contributions
 
-- Architected an end-to-end ISO 20022 pacs.008 validation platform that generates 5,000+ synthetic messages per run with the AWS rapide generator (Java, Spring Boot), injects rule-targeted and statistical-anomaly defects as stored ground truth, and validates every message in a 5-stage C# (.NET 10) `System.Threading.Channels` pipeline (reader → XSD validator → rule engine → anomaly scorer → batched `SqlBulkCopy` writer), benchmarked at 1, 2, 4 and 8 consumers with a same-seed parallel-consistency check.
-- Built a 15-rule validation catalog across schema, format, business, duplicate and security categories, covering ISO 9362 BIC format, ISO 13616 IBAN mod-97 checksums, ISO 4217 currency and decimal precision, UUID v4 UETR checks, `NbOfTxs`/`CtrlSum` reconciliation, charge-bearer and purpose-code lists, and run-scoped duplicate detection, shared as one library by the batch worker and an ASP.NET Core `POST /validate` API.
-- Integrated an ML.NET randomized PCA anomaly scorer trained on rule-valid baseline messages over 7 engineered features (log amount, currency, BIC-derived corridor, currency pair, charge bearer, purpose code, creation hour), served thread-safely through `PredictionEnginePool`, versioned per model file, and evaluated by AUC and detection rate at a fixed false-positive count; it flags unusual messages for review without overriding rule outcomes.
-- Designed the Azure data layer: Blob Storage for raw and injected XML, an Azure SQL relational schema of 10 core entities linking runs, messages, injected defects, rule definitions, rule results, anomaly scores, requirements, test cases, executions and defects, with account numbers masked to the last 4 characters and secrets held in Azure Key Vault.
-- Engineered the QA test-management suite: 4 personas, 19 Given/When/Then requirements, a Requirements Traceability Matrix across 6 workflows, and 27 test cases spanning functional, negative, boundary, integration, performance, load and security types, automated with xUnit, Reqnroll, Testcontainers, BenchmarkDotNet, NBomber and OWASP ZAP in a GitHub Actions or Azure DevOps CI pipeline that exports executions to Azure SQL.
-- Developed a 6-page Power BI report covering validation quality (detection and false-positive rates against ground truth), rule failures, throughput and latency percentiles, OWASP findings by severity, RTM coverage, and anomaly scores by corridor and model version.
+**Status:** in progress. The project foundation is built; the validator, rule engine and anomaly scorer are not, so no detection, throughput or anomaly results are reported yet.
+
+- Designing an end-to-end ISO 20022 pacs.008 validation platform that generates 5,000+ synthetic messages per run with the AWS rapide generator (Java, Spring Boot), injects rule-targeted and statistical-anomaly defects as stored ground truth, and validates every message in a 5-stage C# (.NET 10) `System.Threading.Channels` pipeline (reader → XSD validator → rule engine → anomaly scorer → batched `SqlBulkCopy` writer), to be benchmarked at 1, 2, 4 and 8 consumers with identical results required single-threaded and in parallel.
+- Specifying a 15-rule validation catalog across schema, format, business, duplicate and security categories, covering ISO 9362 BIC format, ISO 13616 IBAN mod-97 checksums, ISO 4217 currency and decimal precision, UUID v4 UETR checks, `NbOfTxs`/`CtrlSum` reconciliation, charge-bearer and purpose-code lists, and run-scoped duplicate detection, to be shared as one library by the batch worker and an ASP.NET Core `POST /validate` API.
+- Planning an ML.NET randomized PCA anomaly scorer trained on rule-valid baseline messages over 7 engineered features (log amount, currency, BIC-derived corridor, currency pair, charge bearer, purpose code, creation hour), served thread-safely through `PredictionEnginePool`, versioned per model file, and evaluated by AUC and detection rate at a fixed false-positive count, flagging unusual messages for review without overriding rule outcomes.
+- Built the relational data layer: a 12-table SQL Server schema verified in Docker, linking runs, messages, injected defects, rule definitions, rule results, anomaly scores, requirements, test cases, executions and defects, with load-test and security-finding tables. Azure Blob Storage, Azure SQL and Key Vault deployment is planned, and IBAN masking to the last 4 characters is implemented and unit tested.
+- Built the QA test-management foundation: 4 personas, 19 Given/When/Then requirements, a Requirements Traceability Matrix across 6 workflows, and 27 test cases spanning functional, negative, boundary, integration, performance, load and security types, to be automated with xUnit, Reqnroll, Testcontainers, BenchmarkDotNet, NBomber and OWASP ZAP in GitHub Actions. The first generator smoke run produced 50 of 50 messages valid against the CBPR+ XSD, with 0 duplicate identifiers; formal test execution is pending.
+- Planning a 6-page Power BI report covering validation quality (detection and false-positive rates against ground truth), rule failures, throughput and latency percentiles, OWASP findings by severity, RTM coverage, and anomaly scores by corridor and model version.
 
 ---
 
