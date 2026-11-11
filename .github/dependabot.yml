@@ -1,0 +1,20 @@
+# Dependency vulnerability and version updates. Each ecosystem opens at most one grouped
+# pull request a week, and every pull request runs the ci and codeql workflows.
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      nuget:
+        patterns: ['*']
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ['*']

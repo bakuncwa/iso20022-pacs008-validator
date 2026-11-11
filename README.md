@@ -19,7 +19,7 @@ The project mirrors how banks and payment processors check ISO 20022 messages be
 | **Storage** | Azure Blob Storage (raw and injected XML), Azure SQL Database (runs, results, tests) |
 | **Secrets** | Azure Key Vault |
 | **Testing** | xUnit, Reqnroll (BDD, behaviour-driven development), Testcontainers, BenchmarkDotNet, NBomber, OWASP ZAP |
-| **CI/CD** | GitHub Actions or Azure DevOps Pipelines (continuous integration and delivery) |
+| **CI/CD & Security Scanning** | GitHub Actions: `ci` builds and tests every push and pull request; `codeql` runs CodeQL static analysis (security-extended queries) on C#; Dependabot opens weekly grouped NuGet and Actions updates |
 | **Reporting** | Power BI Desktop (Power BI Service if a licence is available) |
 | **Anomaly Scoring** | ML.NET (randomized PCA anomaly detection on rule-valid messages), `Microsoft.Extensions.ML` `PredictionEnginePool` |
 
